@@ -1,1 +1,1 @@
-
+SELECT name, SUM(price*reserve) FROM goods GROUP BY(name);
