@@ -1,1 +1,2 @@
-
+SELECT SUM(supply_price) FROM supply WHERE supply_date='2023-09-28';
+-- DATEADD(days, -1, GETDATE())
