@@ -1,0 +1,2 @@
+SELECT COUNT(name) FROM
+(SELECT DISTINCT name FROM goods) AS ans;
