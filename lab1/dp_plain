@@ -1,0 +1,531 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 12.16 (Ubuntu 12.16-0ubuntu0.20.04.1)
+-- Dumped by pg_dump version 12.16 (Ubuntu 12.16-0ubuntu0.20.04.1)
+
+-- Started on 2023-10-02 09:59:22 MSK
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 204 (class 1259 OID 24725)
+-- Name: company_customer; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.company_customer (
+    customer_id integer NOT NULL,
+    address character varying(50) NOT NULL,
+    name character varying(15) NOT NULL
+);
+
+
+ALTER TABLE public.company_customer OWNER TO postgres;
+
+--
+-- TOC entry 203 (class 1259 OID 24720)
+-- Name: company_provider; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.company_provider (
+    provider_id integer NOT NULL,
+    address character varying(50) NOT NULL,
+    name character varying(15) NOT NULL,
+    account_id integer,
+    CONSTRAINT company_provider_account_id_check CHECK (((account_id >= 100000) AND (account_id <= 999999)))
+);
+
+
+ALTER TABLE public.company_provider OWNER TO postgres;
+
+--
+-- TOC entry 209 (class 1259 OID 32963)
+-- Name: customer_order; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.customer_order (
+    order_id integer NOT NULL,
+    order_price integer NOT NULL,
+    order_date date NOT NULL,
+    export_date date NOT NULL,
+    personnel_num integer,
+    customer_id integer,
+    CONSTRAINT customer_order_check CHECK ((export_date >= order_date))
+);
+
+
+ALTER TABLE public.customer_order OWNER TO postgres;
+
+--
+-- TOC entry 210 (class 1259 OID 32979)
+-- Name: customer_order_account; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.customer_order_account (
+    account_id integer NOT NULL,
+    account_date date NOT NULL,
+    payment_date date NOT NULL,
+    order_id integer,
+    CONSTRAINT customer_order_account_check CHECK ((payment_date >= account_date))
+);
+
+
+ALTER TABLE public.customer_order_account OWNER TO postgres;
+
+--
+-- TOC entry 211 (class 1259 OID 32995)
+-- Name: customer_order_consist; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.customer_order_consist (
+    order_consist_id integer NOT NULL,
+    goods_amount integer NOT NULL,
+    status character varying(10) NOT NULL,
+    price integer NOT NULL,
+    customer_order_id integer
+);
+
+
+ALTER TABLE public.customer_order_consist OWNER TO postgres;
+
+--
+-- TOC entry 208 (class 1259 OID 32950)
+-- Name: goods; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.goods (
+    goods_id integer NOT NULL,
+    measure character varying(10) NOT NULL,
+    producer character varying(15) NOT NULL,
+    name character varying(15) NOT NULL,
+    reserve integer NOT NULL,
+    supply_consist_id integer,
+    price double precision
+);
+
+
+ALTER TABLE public.goods OWNER TO postgres;
+
+--
+-- TOC entry 202 (class 1259 OID 24715)
+-- Name: manager; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.manager (
+    personnel_num integer NOT NULL,
+    passport_series character(4) NOT NULL,
+    passport_num character(6) NOT NULL
+);
+
+
+ALTER TABLE public.manager OWNER TO postgres;
+
+--
+-- TOC entry 205 (class 1259 OID 32905)
+-- Name: supply; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.supply (
+    note character varying(100),
+    goods_amount integer NOT NULL,
+    supply_date date NOT NULL,
+    supply_price integer NOT NULL,
+    provider_id integer,
+    personnel_id integer,
+    supply_id integer NOT NULL
+);
+
+
+ALTER TABLE public.supply OWNER TO postgres;
+
+--
+-- TOC entry 206 (class 1259 OID 32930)
+-- Name: supply_account; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.supply_account (
+    account_date date NOT NULL,
+    payment_date date NOT NULL,
+    supply_id integer,
+    supply_account_id integer NOT NULL,
+    CONSTRAINT supply_account_check CHECK ((payment_date >= account_date))
+);
+
+
+ALTER TABLE public.supply_account OWNER TO postgres;
+
+--
+-- TOC entry 207 (class 1259 OID 32940)
+-- Name: supply_consist; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.supply_consist (
+    supply_consist_id integer NOT NULL,
+    status character varying(10) NOT NULL,
+    storage_period date NOT NULL,
+    goods_amount integer NOT NULL,
+    remains character varying(200) NOT NULL,
+    supply_id integer,
+    order_consist_id integer
+);
+
+
+ALTER TABLE public.supply_consist OWNER TO postgres;
+
+--
+-- TOC entry 3030 (class 0 OID 24725)
+-- Dependencies: 204
+-- Data for Name: company_customer; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.company_customer (customer_id, address, name) FROM stdin;
+1	Moscow	Cool team
+2	Berlin	Was ist das
+3	Hamburg	Schnappi
+4	Tokyo	Anime lovers
+5	Katmandu	Nikesh & co
+\.
+
+
+--
+-- TOC entry 3029 (class 0 OID 24720)
+-- Dependencies: 203
+-- Data for Name: company_provider; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.company_provider (provider_id, address, name, account_id) FROM stdin;
+1	St-Petersburg	Spb Electro	\N
+2	Arkhangelsk	Fishermen & co	\N
+3	Yakutsk	Diamond Rush	\N
+4	Brazilia	Fruities	\N
+5	Lissabon	CR7	\N
+6	Paris	Bonjour	\N
+\.
+
+
+--
+-- TOC entry 3035 (class 0 OID 32963)
+-- Dependencies: 209
+-- Data for Name: customer_order; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.customer_order (order_id, order_price, order_date, export_date, personnel_num, customer_id) FROM stdin;
+1	250000	2023-08-30	2023-09-29	1	1
+2	10000000	2023-10-01	2023-10-15	2	3
+3	419000	2023-07-01	2023-11-01	3	5
+\.
+
+
+--
+-- TOC entry 3036 (class 0 OID 32979)
+-- Dependencies: 210
+-- Data for Name: customer_order_account; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.customer_order_account (account_id, account_date, payment_date, order_id) FROM stdin;
+1	2023-10-30	2023-10-30	1
+2	2023-10-30	2023-10-30	2
+3	2023-10-17	2023-10-23	\N
+\.
+
+
+--
+-- TOC entry 3037 (class 0 OID 32995)
+-- Dependencies: 211
+-- Data for Name: customer_order_consist; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.customer_order_consist (order_consist_id, goods_amount, status, price, customer_order_id) FROM stdin;
+1	1000	Accepted	200000	1
+2	100	Checking	10000000	2
+3	100	Accepted	50000	1
+4	22	Accepted	22000	3
+5	97	Accepted	97000	3
+6	1000	Packing	300000	3
+\.
+
+
+--
+-- TOC entry 3034 (class 0 OID 32950)
+-- Dependencies: 208
+-- Data for Name: goods; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.goods (goods_id, measure, producer, name, reserve, supply_consist_id, price) FROM stdin;
+1	kg	FisherJR	Tune	0	1	\N
+2	kg	FisherJR	FishFat	0	2	\N
+3	karat	Almazz	Diamond	0	3	\N
+4	piece	CR7	SoccerUni	0	4	\N
+5	scheme	Baikal	Processor	0	5	\N
+6	kg	KingKong	Bananas	0	6	\N
+7	kg	Tester	Test	0	\N	100
+8	kg	Tester2	Test	0	\N	100
+12	kg	Tester	Testim	0	6	100
+11	kg	Tester2	Testim	0	5	100
+13	karat	Tester3	Testim	0	4	200
+14	karat	Shachta	Ruby	0	4	200
+15	karat	Shachta	Saphire	12	4	200
+\.
+
+
+--
+-- TOC entry 3028 (class 0 OID 24715)
+-- Dependencies: 202
+-- Data for Name: manager; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.manager (personnel_num, passport_series, passport_num) FROM stdin;
+1	1117	168795
+2	8271	992102
+3	8612	999555
+\.
+
+
+--
+-- TOC entry 3031 (class 0 OID 32905)
+-- Dependencies: 205
+-- Data for Name: supply; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.supply (note, goods_amount, supply_date, supply_price, provider_id, personnel_id, supply_id) FROM stdin;
+Pair kinds of fish	1000	2023-09-28	200000	2	1	1
+Fish fats	100	2023-08-31	50000	2	1	2
+Loads of blilliants	100	2023-09-30	10000000	3	2	3
+Football uniform	22	2023-07-20	22000	5	3	4
+Microelectronics	97	2023-09-16	97000	1	2	5
+Bunch of bananas	1000	2023-09-30	300000	4	3	6
+\.
+
+
+--
+-- TOC entry 3032 (class 0 OID 32930)
+-- Dependencies: 206
+-- Data for Name: supply_account; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.supply_account (account_date, payment_date, supply_id, supply_account_id) FROM stdin;
+2023-09-28	2023-09-28	1	1
+2023-08-31	2023-08-31	2	2
+2023-09-30	2023-09-30	3	3
+2023-07-20	2023-07-22	4	4
+2023-09-16	2023-09-17	5	5
+2023-09-30	2023-09-30	6	6
+\.
+
+
+--
+-- TOC entry 3033 (class 0 OID 32940)
+-- Dependencies: 207
+-- Data for Name: supply_consist; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.supply_consist (supply_consist_id, status, storage_period, goods_amount, remains, supply_id, order_consist_id) FROM stdin;
+1	Sea prods	2023-10-05	1000	0	1	1
+2	Fish fats	2023-09-06	100	0	2	3
+3	Diamonds	2023-10-05	100	0	3	2
+4	Uniform	2023-07-27	22	0	4	4
+5	Electro	2024-01-01	97	0	5	5
+6	bananas	2023-10-06	1000	0	6	6
+\.
+
+
+--
+-- TOC entry 2877 (class 2606 OID 24730)
+-- Name: company_customer company_customer_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.company_customer
+    ADD CONSTRAINT company_customer_pkey PRIMARY KEY (customer_id);
+
+
+--
+-- TOC entry 2875 (class 2606 OID 24724)
+-- Name: company_provider company_provider_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.company_provider
+    ADD CONSTRAINT company_provider_pkey PRIMARY KEY (provider_id);
+
+
+--
+-- TOC entry 2889 (class 2606 OID 32984)
+-- Name: customer_order_account customer_order_account_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.customer_order_account
+    ADD CONSTRAINT customer_order_account_pkey PRIMARY KEY (account_id);
+
+
+--
+-- TOC entry 2891 (class 2606 OID 32999)
+-- Name: customer_order_consist customer_order_consist_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.customer_order_consist
+    ADD CONSTRAINT customer_order_consist_pkey PRIMARY KEY (order_consist_id);
+
+
+--
+-- TOC entry 2887 (class 2606 OID 32968)
+-- Name: customer_order customer_order_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.customer_order
+    ADD CONSTRAINT customer_order_pkey PRIMARY KEY (order_id);
+
+
+--
+-- TOC entry 2885 (class 2606 OID 32954)
+-- Name: goods goods_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.goods
+    ADD CONSTRAINT goods_pkey PRIMARY KEY (goods_id);
+
+
+--
+-- TOC entry 2873 (class 2606 OID 24719)
+-- Name: manager manager_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.manager
+    ADD CONSTRAINT manager_pkey PRIMARY KEY (personnel_num);
+
+
+--
+-- TOC entry 2881 (class 2606 OID 33006)
+-- Name: supply_account supply_account_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.supply_account
+    ADD CONSTRAINT supply_account_pkey PRIMARY KEY (supply_account_id);
+
+
+--
+-- TOC entry 2883 (class 2606 OID 32944)
+-- Name: supply_consist supply_consist_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.supply_consist
+    ADD CONSTRAINT supply_consist_pkey PRIMARY KEY (supply_consist_id);
+
+
+--
+-- TOC entry 2879 (class 2606 OID 32929)
+-- Name: supply supply_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.supply
+    ADD CONSTRAINT supply_pkey PRIMARY KEY (supply_id);
+
+
+--
+-- TOC entry 2900 (class 2606 OID 32985)
+-- Name: customer_order_account customer_order_account_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.customer_order_account
+    ADD CONSTRAINT customer_order_account_order_id_fkey FOREIGN KEY (order_id) REFERENCES public.customer_order(order_id);
+
+
+--
+-- TOC entry 2901 (class 2606 OID 33000)
+-- Name: customer_order_consist customer_order_consist_customer_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.customer_order_consist
+    ADD CONSTRAINT customer_order_consist_customer_order_id_fkey FOREIGN KEY (customer_order_id) REFERENCES public.customer_order(order_id);
+
+
+--
+-- TOC entry 2899 (class 2606 OID 32974)
+-- Name: customer_order customer_order_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.customer_order
+    ADD CONSTRAINT customer_order_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.company_customer(customer_id);
+
+
+--
+-- TOC entry 2898 (class 2606 OID 32969)
+-- Name: customer_order customer_order_personnel_num_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.customer_order
+    ADD CONSTRAINT customer_order_personnel_num_fkey FOREIGN KEY (personnel_num) REFERENCES public.manager(personnel_num);
+
+
+--
+-- TOC entry 2897 (class 2606 OID 32955)
+-- Name: goods goods_supply_sonsist_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.goods
+    ADD CONSTRAINT goods_supply_sonsist_id_fkey FOREIGN KEY (supply_consist_id) REFERENCES public.supply_consist(supply_consist_id);
+
+
+--
+-- TOC entry 2894 (class 2606 OID 32935)
+-- Name: supply_account supply_account_supply_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.supply_account
+    ADD CONSTRAINT supply_account_supply_id_fkey FOREIGN KEY (supply_id) REFERENCES public.supply(supply_id);
+
+
+--
+-- TOC entry 2896 (class 2606 OID 33012)
+-- Name: supply_consist supply_consist_order_consist_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.supply_consist
+    ADD CONSTRAINT supply_consist_order_consist_id_fkey FOREIGN KEY (order_consist_id) REFERENCES public.customer_order_consist(order_consist_id);
+
+
+--
+-- TOC entry 2895 (class 2606 OID 32945)
+-- Name: supply_consist supply_consist_supply_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.supply_consist
+    ADD CONSTRAINT supply_consist_supply_id_fkey FOREIGN KEY (supply_id) REFERENCES public.supply(supply_id);
+
+
+--
+-- TOC entry 2893 (class 2606 OID 32913)
+-- Name: supply supply_personnel_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.supply
+    ADD CONSTRAINT supply_personnel_id_fkey FOREIGN KEY (personnel_id) REFERENCES public.manager(personnel_num);
+
+
+--
+-- TOC entry 2892 (class 2606 OID 32908)
+-- Name: supply supply_provider_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.supply
+    ADD CONSTRAINT supply_provider_id_fkey FOREIGN KEY (provider_id) REFERENCES public.company_provider(provider_id);
+
+
+-- Completed on 2023-10-02 09:59:23 MSK
+
+--
+-- PostgreSQL database dump complete
+--
+
