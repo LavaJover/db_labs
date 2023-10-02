@@ -1,1 +1,7 @@
+CREATE OR REPLACE VIEW total_price AS SELECT * FROM 
+(SELECT SUM(price_sum)
+FROM
+(SELECT supply_date, SUM(supply_price) as price_sum
+FROM supply
+GROUP BY supply_date) as tmp1 WHERE supply_date BETWEEN '2023-07-20' AND '2023-09-16') as tmp2;
 
