@@ -1,1 +1,6 @@
-
+(SELECT export_date, SUM(goods_amount) as goods_sum
+FROM
+customer_order
+INNER JOIN
+customer_order_consist
+ON customer_order_id=order_id GROUP BY export_date) ORDER BY (goods_sum) ASC;
