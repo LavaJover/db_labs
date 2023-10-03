@@ -1,1 +1,11 @@
+CREATE OR REPLACE FUNCTION get_full_price() RETURNS setof bigint AS
+$$
+BEGIN
+RETURN QUERY SELECT SUM(supply_price) FROM supply GROUP BY supply_date HAVING supply_date='2023-07-20';
+RETURN;
+END;
+$$ LANGUAGE plpgsql;
 
+
+
+SELECT * FROM get_full_price();
