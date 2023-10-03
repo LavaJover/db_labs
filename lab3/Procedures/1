@@ -1,0 +1,19 @@
+CREATE OR REPLACE VIEW goods_period_v AS SELECT * FROM
+(SELECT goods_id, storage_period, goods.price
+FROM
+supply_consist
+INNER JOIN
+goods ON supply_consist.supply_consist_id=goods.supply_consist_id WHERE storage_period<(SELECT CURRENT_DATE)) as ans;
+
+SELECT * FROM goods_period_v;
+
+CREATE OR REPLACE PROCEDURE lower_price(x int) AS
+$$
+BEGIN
+UPDATE goods
+SET price = price - price*x/100
+WHERE (EXISTS(SELECT * FROM goods_period_v WHERE goods_period_v.goods_id=goods.goods_id));
+END;
+$$ LANGUAGE plpgsql;
+
+CALL lower_price(10);
