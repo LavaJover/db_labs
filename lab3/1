@@ -1,12 +1,1 @@
-CREATE OR REPLACE VIEW customers_v AS SELECT * FROM
-(SELECT name, SUM(goods_amount) as goods_sum
-FROM
-(SELECT name, company_customer.customer_id, export_date, goods_amount
-FROM
-company_customer
-INNER JOIN
-(SELECT customer_id, export_date, goods_amount
-FROM
-customer_order
-INNER JOIN
-customer_order_consist ON (order_id=customer_order_id)) as orders ON company_customer.customer_id=orders.customer_id WHERE export_date BETWEEN '2023-01-01' AND '2023-12-31') as tmp GROUP BY name) as tmp1;
+
