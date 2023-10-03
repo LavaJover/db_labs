@@ -1,0 +1,14 @@
+CREATE OR REPLACE FUNCTION good_supply_control() RETURNS trigger AS '
+BEGIN
+if exists(select supply_consist_id FROM goods WHERE supply_consist_id IS NULL)
+then delete from goods WHERE supply_consist_id IS NULL;
+end if;
+return OLD;
+END;
+' LANGUAGE plpgsql;
+
+CREATE TRIGGER tr_good_supply_ctrl
+AFTER INSERT ON goods FOR EACH ROW
+EXECUTE PROCEDURE good_supply_control();
+
+INSERT INTO goods VALUES(16, 'kr', 'x', 'x', 0, NULL, 200);
