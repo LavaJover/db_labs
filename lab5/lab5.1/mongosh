@@ -1,0 +1,6 @@
+db.unicorns.insertOne(
+... {name: "Aurora",
+... gender:'f',
+... weight: 450
+... }
+... );
