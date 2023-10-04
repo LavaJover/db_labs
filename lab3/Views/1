@@ -9,5 +9,6 @@ INNER JOIN
 FROM
 customer_order
 INNER JOIN
-customer_order_consist ON (order_id=customer_order_id)) as orders ON company_customer.customer_id=orders.customer_id WHERE export_date BETWEEN '2023-01-01' AND '2023-12-31') as tmp GROUP BY name) as tmp1;
+customer_order_consist ON (order_id=customer_order_id)) as orders
+ON company_customer.customer_id=orders.customer_id WHERE export_date BETWEEN '2023-01-01' AND '2023-12-31') as tmp GROUP BY name) as tmp1;
 SELECT * FROM customers_v;
