@@ -1,7 +1,5 @@
 
-SELECT company_provider.name, provider_count.name, provider_count_price
-FROM
-(SELECT company_provider.name, provider_count.name, provider_count.price
+SELECT company_provider.name, provider_count.name, provider_count.price
 FROM
 company_provider
 INNER JOIN
@@ -24,5 +22,4 @@ INNER JOIN
 		FROM GOODS
 		GROUP BY GOODS.NAME,
 			GOODS.PRICE) AS GOODS_COUNT ON GOODS.NAME = GOODS_COUNT.NAME
-AND GOODS.PRICE = GOODS_COUNT.PRICE
-AND COUNTER > 1) AS goods_tab ON goods_tab.supply_consist_id=supply_consist.supply_consist_id) AS supply_count ON supply.supply_id=supply_count.supply_id) AS provider_count ON provider_count.provider_id=company_provider.provider_id) WHERE COUNT();
+AND GOODS.PRICE = GOODS_COUNT.PRICE) AS goods_tab ON goods_tab.supply_consist_id=supply_consist.supply_consist_id) AS supply_count ON supply.supply_id=supply_count.supply_id) AS provider_count ON provider_count.provider_id=company_provider.provider_id;
