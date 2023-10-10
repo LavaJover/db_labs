@@ -1,17 +1,13 @@
-SELECT NAME,
-	GOODS_COUNT
-FROM COMPANY_PROVIDER
-INNER JOIN
-	(SELECT PROVIDER_ID,
-			GOODS_COUNT
-		FROM SUPPLY
-		INNER JOIN
-			(SELECT SUPPLY_ID,
-					GOODS_COUNT
-				FROM SUPPLY_CONSIST
-				INNER JOIN
-					(SELECT SUPPLY_CONSIST_ID,
-							COUNT(GOODS_ID) AS GOODS_COUNT
-						FROM GOODS
-						GROUP BY(SUPPLY_CONSIST_ID)) AS GOODS_TAB ON SUPPLY_CONSIST.SUPPLY_CONSIST_ID = GOODS_TAB.SUPPLY_CONSIST_ID) AS SUPPLY_TAB ON SUPPLY.SUPPLY_ID = SUPPLY_TAB.SUPPLY_ID) AS PROVIDER_TAB ON PROVIDER_TAB.PROVIDER_ID = COMPANY_PROVIDER.PROVIDER_ID;
-
+SELECT company_provider.name
+FROM
+	(SELECT DISTINCT g.name as g_name, provider_id
+	FROM
+		(SELECT goods.name, supply_id
+		FROM goods
+		INNER JOIN supply_consist ON goods.supply_consist_id=supply_consist.supply_consist_id) as g
+	INNER JOIN
+	supply
+	ON supply.supply_id=g.supply_id) as prov
+INNER JOIN company_provider
+ON company_provider.provider_id=prov.provider_id
+GROUP BY company_provider.name HAVING COUNT(g_name) = (SELECT COUNT(name) FROM (SELECT DISTINCT name FROM goods) as tmp1);
