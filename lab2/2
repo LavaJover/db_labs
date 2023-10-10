@@ -1,21 +1,24 @@
-SELECT company_provider.name, ans.name, min_price
+SELECT ans.name, min_price, company_provider.name
 FROM
+	(SELECT provider_id, name, min_price
+	FROM
+		(SELECT supply_id, name, min_price
+		FROM
+			(SELECT supply_consist_id, goods.name, min_price
+			FROM
+				(SELECT goods.name, MIN(price) as min_price
+				FROM
+				goods
+				GROUP BY goods.name) as good
+			INNER JOIN
+			goods
+			ON goods.name = good.name AND goods.price=min_price) as sup
+		INNER JOIN
+		supply_consist
+		ON supply_consist.supply_consist_id=sup.supply_consist_id) as prov
+	INNER JOIN
+	supply
+	ON supply.supply_id = prov.supply_id) as ans
+INNER JOIN
 company_provider
-INNER JOIN
-(SELECT provider_id, name, min_price
-FROM
-supply
-INNER JOIN
-(SELECT supply_id, name, min_price
-FROM
-supply_consist
-INNER JOIN
-(SELECT goods.supply_consist_id, goods_min.name, min_price
-FROM
-goods
-INNER JOIN
-(SELECT name, MIN(price) as min_price
-FROM
-goods
-GROUP BY name) as goods_min ON goods.name=goods_min.name AND goods.price=min_price) AS supply_min ON supply_consist.supply_consist_id=supply_min.supply_consist_id) AS provider_min ON supply.supply_id=provider_min.supply_id) AS ans ON ans.provider_id=company_provider.provider_id;
-
+ON company_provider.provider_id=ans.provider_id;
